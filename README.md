@@ -114,7 +114,7 @@ For convenience, You may like to run `calcify` as a Git post-receive hook in in 
 That's it! 
 
 
-## Full template syntax
+## Full view syntax
 
 Example content:
 
@@ -122,16 +122,64 @@ Example content:
 ((route   "")
  (view    "layout")
  (title   "Some title")
- (tags    ("tag1", "tag2", "tag3")))
+ (parent  (/parent-link "Parent title"))
+ (tags    (("link1" tag1") ("link2" tag2") ("link3" "tag3"))))
  ```
+#### Tags
+
+Attributes use the `=` form.
+Symbols and numbers are converted to strings.
+Children are concatenated with a space. 
+Every other s-exp will use its first item as the tag name:
+
+```scheme
+(br)
+(div my div)
+(a (= href /) (= class link) home)
+(ul (li symbol) (li 1000) (li "some string"))
+
+```
+```html
+<br>
+<div>my div</div>
+<a href="/" class="link">home</a>
+<ul><li>symbol</li> <li>1000</li> <li>some string</li></ul>
+```
+
+Notes: 
+- A tag s-exp must have children for its closing tag to be rendered. Just use a single empty string child for this purpose, i.e: `(script (= src /script.js) "")`
+- Html5 is assumed, there are no self-closing tags
+- Where all else fails, you can embed html as strings
 
 #### References
 
 ```scheme
 ;; (: property)
-(: title) ; -> "Some title"
-(: non-existent) ; -> ""
+(: title) -> "Some title"
+(: non-existent) -> ""
 
 ;; (: property k1 ... kn)
-(: tags 0) ; -> "tag1"
+(: tags 0) -> "tag1"
 ```
+
+#### List comprehensions
+```scheme
+;; (-> (list value index) body)
+(-> (tags tag i) (a (= href (: tag 0)) (: tag 1)))
+```
+```html
+<a href="link1">tag1</a> <a href="link2">tag2</a> <a href="link3">tag3</a>
+```
+
+#### Existence conditionals
+
+These are not full conditionals - they only check for existence. If no 'else' supplied, a blank string is returned.
+
+```scheme
+;; (? exists? then else)
+(? parent (a (= href (: parent 0)) (: parent 1)))
+```
+```html
+<a href="/parent-link">Parent title</a>
+```
+
