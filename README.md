@@ -1,9 +1,8 @@
 # Calcify
 
-A tiny (7kb) static site generator for developers, written in [Racket](http://racket-lang.org).
+A tiny static site generator for developers, written in [Racket](http://racket-lang.org).
 
 Calcify is developed and supported by studio/studio.
-
 
 
 ## Install
@@ -12,35 +11,40 @@ Calcify runs with [Racket](http://racket-lang.org), a popular Scheme dialect and
 
 To get Calcify itself:
 
-    git clone git://github.com/twfarland/calcify.git
+    git clone git@github.com:twfarland/calcify.git
     cd calcify
-    raco exe src/generate.rkt
-    raco exe src/develop.rkt
+    bash install.sh
 
-Calcify provides two programs:
+Now include the `/{PATH-TO-CALCIFY}/bin/` in your `$PATH` variable (in your bash profile). You may need to restart your terminal to gain access to the `calcify` command.
 
-### ./generate
 
-Builds the static files in the `/public` folder. This is used in deployment.
+## Using the `calcify` command
 
-### ./develop
-
-Runs the site dynamically on `http://localhost:8080`. This is a development convenience.
-When `/content` or `/view` folders are changed, the changes will be reflected without need for site regeneration.
-
-### Directory structure
-
-    /assets <- Any extra static files, these will be copied to /public upon generation
-    /content <- Your content .rkt files, from which the html will be generated
-    /public <- Where the static files are generated. Point your webserver at this
-    /src <- The Calcify source files
-    /views <- Your view .rkt files, where your layouts are defined
-    generate <- The site generator program
-    develop <- The site development program
-
+    Usage: calcify [options]
+                                      
+    With zero option flags, calcify generates static files in {CURRENT_DIRECTORY}/public 
+                                      
+    Options:
+       -v       Print calcify's version
+       -h       Display this help message
+       -init    Initialize calcify project folders in the current directory
+       -dev     Run the project in the current directory locally
 
 
 ## Example usage
+
+### 1: Initialise a project
+
+    mkdir calcify-example
+    cd calcify-example
+    calcify -init
+
+This builds the following directory structure for your project:
+
+    /assets    <- Base static files, these will be copied to /public upon generation
+    /content   <- Your content .rkt files, from which the html will be generated
+    /public    <- Where the static files are generated. Serve this with your production webserver
+    /views     <- Your view .rkt files, where your layouts are defined
 
 ### 1: Create a layout view
 
@@ -58,9 +62,6 @@ Create this file in your Calcify `/views` directory:
 ```
 
 The head of an s-exp is usually the tag name. s-exps starting with `=` define tag attributes, and those starting with `:` define references to data being propagated the view.
-
-The full view syntax is described at the bottom of this document.
-
 
 ### 2: Create some pages
 
@@ -85,26 +86,52 @@ Create these files in your Calcify `/content` directory:
                     (p paragraph 2))))
 ```
 
-`route` defines the path to this page, both when served during development and when generated. Every other key is optional, dependent on what you want to put in your views
+`route` defines the path to this page, both when served during development and when generated. `view` is the filename (without .rkt extension) of the view you want to use for this page. Every other key is optional, dependent on what you want to put in your views
 
+### 3: Run the development server
 
-## 3: Run the development server
+    calcify -dev
 
-    ./develop
-
-This will run the site on `http://localhost:8080`. Visit it and see your rendered pages!
+Runs the site on `http://localhost:8080`, using Racket's webserver.
+Each request checks the filesystem for changes. As such it is intended as a development convenience only.
 Try altering your views or content, or adding new ones, then refresh the page. Your changes will be present.
-Any css/js/images in `/assets` will be available in this server. *Beware* don't work with those in the `/public` folder, as these will be overwritten when the site is generated.
+Any css/js/images in `/assets` will be available in this server. 
 
+*Beware:* don't work with files in the `/public` folder, as these will be overwritten when the site is generated.
 
-## 4: Generate
+### 4: Generate
 
 When all looks good, you can run:
 
-     ./generate  
+    calcify
 
 This will create html files for the site in the `/public` folder. Point your production webserver (such as nginx) at this directory.
 
 Make sure your production webserver renders `index.html` files as expected, i.e. `/somepath` refers to `/somepath/index.html`.
 
-It works well to run `./generate` as a post-receive hook in Git.
+For convenience, You may like to run `calcify` as a Git post-receive hook in in your production environment.
+
+That's it! 
+
+
+## Full template syntax
+
+Example content:
+
+```scheme
+((route   "")
+ (view    "layout")
+ (title   "Some title")
+ (tags    ("tag1", "tag2", "tag3")))
+ ```
+
+#### References
+
+```scheme
+;; (: property)
+(: title) ; -> "Some title"
+(: non-existent) ; -> ""
+
+;; (: property k1 ... kn)
+(: tags 0) ; -> "tag1"
+```

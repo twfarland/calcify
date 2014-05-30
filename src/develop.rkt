@@ -10,6 +10,8 @@
          "build-content.rkt"
          "utils.rkt")
 
+(provide develop)
+
 
 ;; This needs to be defined outside the scope of (start)
 (define dir (path->string (current-directory)))
@@ -39,12 +41,13 @@
 
 ;; Server config
 ;; Handles css,js,img directories normally
-(serve/servlet start 
-               #:port 8080
-               #:servlet-path "/"
-               #:servlet-regexp (regexp "(?<!\\.js|css|jpg|png|gif)$")
-               #:extra-files-paths (list (build-path dir "assets"))
-               #:stateless? #t)
+(define (develop)
+  (serve/servlet start 
+                 #:port 8080
+                 #:servlet-path "/"
+                 #:servlet-regexp (regexp "(?<!\\.js|css|jpg|png|gif)$")
+                 #:extra-files-paths (list (build-path dir "assets"))
+                 #:stateless? #t))
 
 
 

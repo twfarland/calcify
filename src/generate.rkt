@@ -1,6 +1,7 @@
 #lang racket
 
 (require "utils.rkt" "build-content.rkt")
+(provide generate)
 
 
 ;; string -> void
@@ -31,10 +32,9 @@
     (match route-html
       ((list route html) (write-path (++ here "public/" route "/index.html") html))))
   
-  (display (++ "Inert: built [" (number->string (length content)) "] pages\n")))
+  (display (++ "calcify: built [" (number->string (length content)) "] pages in " here "public\n")))
 
 
-(generate)
 
 
 
