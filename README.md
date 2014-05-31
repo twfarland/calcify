@@ -123,7 +123,7 @@ Example content:
  (view    "layout")
  (title   "Some title")
  (parent  (/parent-link "Parent title"))
- (tags    (("link1" tag1") ("link2" tag2") ("link3" "tag3"))))
+ (tags    (("link1" "tag1") ("link2" "tag2") ("link3" "tag3"))))
  ```
 #### Tags
 
