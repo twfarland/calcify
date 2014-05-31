@@ -30,7 +30,7 @@
   (let ((attrs (if (null? attrs)    "" (string-join (cons "" (map (λ (s) (sxp->attr s scope)) attrs)) " ")))
         (body  (if (null? children) "" (string-join (map (λ (s) (sxp->html s scope)) children) " ")))
         (close (if (null? children) "" (++ "</" tag ">"))))
-    (string-append "<" tag attrs ">" body close)))
+    (++ "<" tag attrs ">" body close)))
 
 
 ;; (? prop then) if exists then then or ""
