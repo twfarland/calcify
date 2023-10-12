@@ -2,8 +2,6 @@
 
 A tiny static site generator for developers, written in [Racket](http://racket-lang.org).
 
-Calcify is developed and supported by studio/studio.
-
 
 ## Install
 
